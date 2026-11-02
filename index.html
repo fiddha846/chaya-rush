@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Chaya Rush — Kerala Tea Shop</title>
+  <meta name="description" content="Chaya Rush — an interactive 3D Kerala chayakkada. Stage 2: customers, Malayalam orders, serving and a 60-second round." />
+  <link rel="stylesheet" href="./styles.css" />
+
+  <!-- Local, vendored Three.js (no CDN, works offline once served locally) -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./vendor/three/three.module.js",
+        "three/addons/": "./vendor/three/addons/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="app" aria-label="3D view of the tea shop"></div>
+
+  <!-- Loading screen -->
+  <div id="loading" class="overlay">
+    <div class="loading-card">
+      <div class="loading-mark" aria-hidden="true">☕</div>
+      <h1 class="loading-title">Chaya Rush</h1>
+      <p class="loading-ml ml">ചായക്കട</p>
+      <div class="loading-bar"><span id="loading-bar-fill"></span></div>
+      <p id="loading-status" class="loading-status">Warming the tea…</p>
+    </div>
+  </div>
+
+  <!-- In-game HUD (hidden until the scene is ready) -->
+  <div id="hud" class="hud" hidden>
+    <div class="hud-top">
+      <div class="brand">
+        <span class="brand-title">Chaya Rush</span>
+        <span class="brand-ml ml">ചായക്കട</span>
+      </div>
+
+      <div class="scorebar" aria-label="Round score">
+        <div class="score-item">
+          <span class="score-label">Time</span>
+          <span id="round-timer" class="score-value">60s</span>
+        </div>
+        <div class="score-item">
+          <span class="score-label">Earned</span>
+          <span id="earnings" class="score-value">₹0</span>
+        </div>
+        <div class="score-item">
+          <span class="score-label">Orders</span>
+          <span id="orders-served" class="score-value">0</span>
+        </div>
+      </div>
+
+      <div class="badges">
+        <span class="badge badge-stage">STAGE 2 · ORDERS</span>
+        <span class="badge badge-placeholder" title="All geometry and materials are temporary test art">
+          PLACEHOLDER ART
+        </span>
+      </div>
+    </div>
+
+    <!-- Order cards are placed over the 3D customers every frame. -->
+    <div id="order-layer" class="order-layer"></div>
+
+    <div class="hud-bottom">
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+      <div id="serve-dock" class="serve-dock">
+        <div class="serve-head">
+          <span id="serve-hint" class="serve-hint">Waiting for the first customer…</span>
+          <span id="serve-selected" class="serve-selected">No guest selected</span>
+        </div>
+        <div id="serve-grid" class="serve-grid"></div>
+      </div>
+
+      <div class="hud-footer">
+        <div class="controls-hint">
+          <span><kbd>Drag</kbd> look around</span>
+          <span><kbd>Click</kbd> select guest</span>
+          <span><kbd>Tap item</kbd> serve</span>
+          <span><kbd>Double-click</kbd> pointer lock</span>
+        </div>
+        <div class="fps" id="fps" aria-hidden="true">– fps</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Round summary -->
+  <div id="results" class="overlay results" hidden>
+    <div class="loading-card results-card">
+      <p class="results-kicker">TIME'S UP</p>
+      <h1 class="loading-title">Chaya Rush</h1>
+      <p class="results-ml ml">ചായക്കട</p>
+      <p class="results-earned"><span id="results-earnings">₹0</span></p>
+      <p id="results-orders" class="loading-status">0 orders completed</p>
+      <button id="play-again" class="play-again" type="button">Play again</button>
+      <p class="results-note">Placeholder art · client-side test build</p>
+    </div>
+  </div>
+
+  <!-- Fatal error surface -->
+  <div id="error" class="overlay error" hidden>
+    <div class="loading-card">
+      <h1 class="loading-title">Something went wrong</h1>
+      <p id="error-text" class="loading-status"></p>
+      <p class="error-help">
+        Make sure the project is being served over HTTP (not opened as a file).
+        See <code>README.md</code> for the exact command.
+      </p>
+    </div>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
