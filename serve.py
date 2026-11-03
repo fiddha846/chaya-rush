@@ -1,5 +1,5 @@
 """
-Chaya Rush — local development server.
+ചായക്കട (Chayakkada) — local development server.
 
 Same as `python -m http.server`, but sends no-store headers so edited ES
 modules, textures and fonts are never served stale from the browser cache.
@@ -41,7 +41,7 @@ def main():
     handler = functools.partial(NoCacheHandler, directory=".")
     socketserver.TCPServer.allow_reuse_address = True
     with socketserver.ThreadingTCPServer(("127.0.0.1", port), handler) as httpd:
-        print(f"Chaya Rush dev server: http://127.0.0.1:{port}/")
+        print(f"Chayakkada dev server: http://127.0.0.1:{port}/")
         print("Press Ctrl+C to stop.")
         try:
             httpd.serve_forever()

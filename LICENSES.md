@@ -1,4 +1,4 @@
-# Licenses & attributions — Chaya Rush
+# Licenses & attributions — ചായക്കട
 
 This file must be updated whenever a new third-party asset is added.
 Keep the original license text in the repo next to the asset where possible.
@@ -38,8 +38,9 @@ OFL notes:
 ## Procedural textures
 
 All wood, tile, plaster, menu-board, poster, clock and particle textures in
-`src/world/shop.js` are generated at runtime with the Canvas 2D API from code
-written for this project. No external image licenses apply to them.
+`src/world/art.js`, `src/world/shop.js` and `src/world/scene.js` are generated
+at runtime with the Canvas 2D API from code written for this project. No
+external image licenses apply to them.
 
 ## Placeholder geometry
 

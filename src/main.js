@@ -1,98 +1,137 @@
 import * as THREE from "three";
 import { createRenderer, createWorld } from "./world/scene.js";
 import { buildShop } from "./world/shop.js";
-import { LookControls } from "./player/lookControls.js";
+import { CameraRig } from "./player/camera.js";
 import { GameSession } from "./game/session.js";
-import { OrderOverlay } from "./ui/orders.js";
-import {
-  setLoadingStatus,
-  hideLoading,
-  showError,
-  setFps,
-  setRoundTime,
-  setEarnings,
-  setOrdersServed,
-  setServeHint,
-  setRoundActive,
-  toast,
-  showResults,
-  hideResults,
-} from "./ui/hud.js";
+import { Hud } from "./ui/hud.js";
+import { UI } from "./config/strings.ml.js";
 
 /**
- * CHAYA RUSH — Stage 2 entry point.
- * Boots the renderer, builds the interior, starts the seated look-around, then
- * opens a 60-second round of customers, Malayalam orders and serving.
+ * ചായക്കട — entry point.
+ *
+ * Boots the renderer and the little street, seats the chaiwala behind the
+ * counter, then opens a continuous evening shift: customers order in
+ * Malayalam, the owner prepares and carries their tray, and the bill is settled
+ * at the end.
  */
 
 async function loadMalayalamFont() {
   if (!document.fonts) return;
   try {
-    // Wait for the font used by canvas-drawn signs and DOM order cards so
-    // shaping is correct on the first frame.
     await document.fonts.load('700 64px "Noto Sans Malayalam"', "ചായ");
     await document.fonts.load('600 34px "Noto Sans Malayalam"', "ചായ");
     await document.fonts.ready;
   } catch (err) {
-    console.warn("[Chaya Rush] Malayalam font did not load; signs may fall back.", err);
+    console.warn("[ചായക്കട] Malayalam font did not load; signs may fall back.", err);
   }
 }
 
-async function boot() {
-  try {
-    setLoadingStatus("Loading the shop…", 12);
-    await loadMalayalamFont();
+const nextFrame = () =>
+  new Promise((resolve) => {
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      resolve();
+    };
+    window.setTimeout(finish, 900);
+    requestAnimationFrame(() => requestAnimationFrame(finish));
+  });
 
-    setLoadingStatus("Warming the tea…", 40);
+function modalOpen() {
+  return Boolean(document.querySelector(".modal.is-visible"));
+}
+
+async function boot() {
+  const hud = new Hud();
+  try {
+    hud.setLoading(UI.loadingFont, 8);
+    await loadMalayalamFont();
 
     const app = document.getElementById("app");
     if (!app) throw new Error("Missing #app container.");
 
-    // Fail early with a readable message if WebGL is unavailable.
     const probe = document.createElement("canvas");
     if (!probe.getContext("webgl2")) {
-      throw new Error(
-        "WebGL2 is not available in this browser. Enable hardware acceleration or use a current Chrome/Edge/Firefox."
-      );
+      throw new Error("WebGL2 is not available in this browser.");
     }
 
+    hud.setLoading(UI.loadingWorld, 26);
     const renderer = createRenderer(app);
-    const { scene, camera } = createWorld();
+    const world = createWorld();
+    const { scene, camera } = world;
 
-    setLoadingStatus("Arranging tables and lamps…", 68);
+    hud.setLoading(UI.loadingShop, 58);
     const shop = buildShop({ scene, renderer });
 
-    const controls = new LookControls(camera, renderer.domElement, {
-      sensitivity: 0.0026,
-      pitchMin: THREE.MathUtils.degToRad(-58),
-      pitchMax: THREE.MathUtils.degToRad(52),
-    });
+    const rig = new CameraRig(camera, renderer.domElement);
+    rig.showExterior();
 
-    // The overlay's callbacks close over `session`, which is created below.
     let session = null;
-    const overlay = new OrderOverlay({
-      onSelect: (customer) => session?.select(customer),
-      onServe: (itemId) => session?.serve(itemId),
+    let started = false;
+    let shiftOpen = false;
+
+    hud.cb.onSelect = (customer) => session?.select(customer);
+    hud.cb.onDeselect = () => session?.deselect();
+    hud.cb.onCarry = () => session?.startCarry();
+    hud.cb.onBill = () => session?.openBill();
+    hud.cb.onGive = () => session?.give();
+    hud.cb.onPay = () => session?.payBill();
+    hud.cb.onPrepare = (customer, lineId) => session?.prepare(customer, lineId);
+    hud.cb.onKidPrice = (customer, price) => session?.answerKidPrice(customer, price);
+
+    session = new GameSession({ scene, camera, rig, hud, world });
+
+    hud.setLoading(UI.loadingLights, 84);
+    renderer.render(scene, camera);
+    await nextFrame();
+
+    hud.setLoading(UI.ready, 100);
+    hud.hideLoading();
+    hud.showStart();
+
+    /* ---------------------------------------------------------------- */
+    /*  Intro + start                                                    */
+    /* ---------------------------------------------------------------- */
+
+    const introCaption = document.getElementById("intro-caption");
+
+    function beginGame() {
+      if (started) return;
+      started = true;
+      hud.hideStart();
+      if (introCaption) {
+        introCaption.hidden = false;
+        void introCaption.offsetWidth;
+        introCaption.classList.add("is-visible");
+      }
+
+      rig.playIntro(() => {
+        if (introCaption) {
+          introCaption.classList.remove("is-visible");
+          window.setTimeout(() => {
+            if (introCaption) introCaption.hidden = true;
+          }, 800);
+        }
+        hud.reveal();
+        session.startShift();
+        shiftOpen = true;
+      });
+    }
+
+    document.getElementById("start-button")?.addEventListener("click", beginGame);
+    window.addEventListener("keydown", (event) => {
+      if (started) return;
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        beginGame();
+      }
     });
 
-    session = new GameSession({
-      scene,
-      camera,
-      overlay,
-      hud: {
-        setRoundTime,
-        setEarnings,
-        setOrdersServed,
-        setServeHint,
-        setRoundActive,
-        toast,
-        showResults,
-        hideResults,
-      },
-    });
+    /* ---------------------------------------------------------------- */
+    /*  Pointing at customers                                           */
+    /* ---------------------------------------------------------------- */
 
-    // Clicking a customer in the 3D scene selects them. A small drag threshold
-    // keeps look-around drags from counting as clicks.
     const raycaster = new THREE.Raycaster();
     const ndc = new THREE.Vector2();
     const canvas = renderer.domElement;
@@ -110,8 +149,8 @@ async function boot() {
       press = null;
 
       if (dx * dx + dy * dy > 64) return;
-      if (controls.pointerLocked) return;
-      if (session.phase !== "running") return;
+      if (!shiftOpen || modalOpen() || rig.pointerLocked) return;
+      if (session.carry) return;
 
       const rect = canvas.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) return;
@@ -123,52 +162,48 @@ async function boot() {
       raycaster.setFromCamera(ndc, camera);
 
       const customer = session.customers.pick(raycaster);
-      session.select(customer);
+      if (customer) session.select(customer);
+      else session.deselect();
     });
 
-    document.getElementById("play-again")?.addEventListener("click", () => {
-      hideResults();
-      session.start();
-    });
+    /* ---------------------------------------------------------------- */
+    /*  Keys                                                             */
+    /* ---------------------------------------------------------------- */
 
     window.addEventListener("keydown", (event) => {
-      if (event.key.toLowerCase() === "r" && session.phase === "ended") {
-        hideResults();
-        session.start();
+      const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+
+      if (key === "Escape") {
+        if (modalOpen()) {
+          hud.closeBill();
+          hud.closeMenu();
+          hud.hideKidPrice();
+          return;
+        }
+        if (rig.pointerLocked) {
+          document.exitPointerLock?.();
+          return;
+        }
+        session.deselect();
+        return;
+      }
+
+      if (!shiftOpen || modalOpen()) return;
+
+      if (key === " ") {
+        event.preventDefault();
+        if (session.carry?.phase === "arrived") session.give();
+        return;
+      }
+
+      if (key === "m") {
+        hud.openMenu();
       }
     });
 
-    setLoadingStatus("Lighting the lamps…", 90);
-
-    // Render one frame before revealing the scene so there is no flash.
-    // The sun and all shadow casters are static, so bake the shadow map once
-    // instead of paying for a full shadow pass every frame.
-    renderer.render(scene, camera);
-    renderer.shadowMap.autoUpdate = false;
-
-    // Give the browser two frames to present the baked image. In a background
-    // or occluded tab requestAnimationFrame is throttled (or paused entirely),
-    // so fall back to a timer rather than hanging the loading screen forever.
-    await new Promise((resolve) => {
-      let settled = false;
-      const finish = () => {
-        if (settled) return;
-        settled = true;
-        resolve();
-      };
-      window.setTimeout(finish, 800);
-      requestAnimationFrame(() => requestAnimationFrame(finish));
-    });
-
-    setLoadingStatus("Ready", 100);
-    hideLoading();
-    session.start();
-
-    const timer = new THREE.Timer();
-    timer.connect(document);
-    let frames = 0;
-    let fpsAccum = 0;
-    let fps = 0;
+    /* ---------------------------------------------------------------- */
+    /*  Frame loop                                                       */
+    /* ---------------------------------------------------------------- */
 
     function onResize() {
       camera.aspect = window.innerWidth / window.innerHeight;
@@ -178,48 +213,66 @@ async function boot() {
     }
     window.addEventListener("resize", onResize);
 
+    const timer = new THREE.Timer();
+    timer.connect(document);
+    let frames = 0;
+    let fpsAccum = 0;
+    let fps = 0;
+
     renderer.setAnimationLoop((timeMs) => {
       timer.update(timeMs);
       const dt = Math.min(timer.getDelta(), 0.05);
       const elapsed = timer.getElapsed();
 
-      controls.update(dt, elapsed);
+      world.update(dt, elapsed);
       shop.update(dt, elapsed);
-      session.update(dt, elapsed);
+      rig.update(dt, elapsed);
+      if (shiftOpen) session.update(dt, elapsed);
       renderer.render(scene, camera);
 
       frames += 1;
       fpsAccum += dt;
       if (fpsAccum >= 0.5) {
         fps = frames / fpsAccum;
-        setFps(fps);
+        hud.setFps(fps);
         frames = 0;
         fpsAccum = 0;
       }
     });
 
-    // Small debug handle for automated checks (not gameplay).
     window.__CHAYA_RUSH__ = {
-      stage: 2,
       ready: true,
       THREE,
       renderer,
       scene,
       camera,
-      controls,
+      rig,
+      world,
       shop,
+      hud,
       session,
-      overlay,
+      start: beginGame,
+      skipIntro: () => {
+        rig.skipScript();
+        shiftOpen = true;
+      },
       getState: () => session.getState(),
-      serve: (itemId) => session.serve(itemId),
-      selectById: (id) => session.selectById(id),
       getFps: () => fps,
+      forceRain: (on) => world.weather.forceRain(on),
+      spawn: (opts = {}) => session.customers.spawn(opts),
+      selectById: (id) => session.selectById(id),
+      prepare: (lineId) => session.prepare(session.selected, lineId),
+      startCarry: () => session.startCarry(),
+      give: () => session.give(),
+      openBill: () => session.openBill(),
+      payBill: () => session.payBill(),
+      answerKidPrice: (customer, price) => session.answerKidPrice(customer, price),
     };
     document.body.dataset.chayaReady = "true";
-    console.info("[Chaya Rush] Stage 2 ready. Placeholder art.");
+    console.info("[ചായക്കട] ചായക്കട തയ്യാർ.");
   } catch (err) {
-    console.error("[Chaya Rush] boot stack:", err && err.stack ? err.stack : err);
-    showError(err && err.message ? err.message : err);
+    console.error("[ചായക്കട] boot stack:", err && err.stack ? err.stack : err);
+    hud.showError(UI.errorText);
   }
 }
 

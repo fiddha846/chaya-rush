@@ -1,14 +1,16 @@
-# ASSETS NEEDED — Chaya Rush
+# ASSETS NEEDED — ചായക്കട
 
 Status: **planning / placeholders only.** Nothing in this list has been
 downloaded yet except Three.js and the Malayalam font. No accounts created,
 no money spent, no unverified asset used.
 
-Art direction: **semi-realistic** (stylized realism). Prioritise cohesive PBR-ish
-models with believable scale over photoreal scans.
+Art direction: **warm cartoon** (stylised, flat colours, soft rounded shapes,
+low-poly). Think a friendly illustrated Kerala chayakkada at dusk — not
+photoreal and not semi-realistic. Priorities are a cohesive palette, readable
+silhouettes and believable scale over surface detail.
 
 Scale convention: **1 unit = 1 metre**. Standing customer eye height ≈ 1.6–1.7 m.
-Self-check: this shop interior is 10 × 8 m with a 3.3 m ceiling.
+Self-check: this shop interior is 9.6 × 8.4 m with a 3.25 m ceiling.
 
 Preferred format: **`.glb`** (binary glTF), with embedded textures where possible.
 Animation must be embedded as glTF animation clips (not separate video).
@@ -50,8 +52,9 @@ One small scan/model per item, or a shared “snack” set reskinned:
 - samoosa, pazhampori, chickenroll, paripuvada, ullivada, mutta baji,
   uzhnnvada, bonda, sugiyan.
 
-Format: GLB, low-poly, PBR. Small props (5–12 cm). Can be approximate; they are
-behind glass or on plates.
+Format: GLB, low-poly, flat/simple materials. Small props (5–12 cm). Can be
+approximate; they are behind glass or on plates, and the game already draws
+recognisable stand-ins procedurally.
 
 ## 4. Characters (hardest to source)
 
@@ -69,8 +72,8 @@ Requirements:
   skin tones, hair) so orders are easy to attribute.
 
 > I **cannot** hand-model, texture, rig or animate believable humans. These must
-> be sourced or commissioned. Until then, customers are clearly marked
-> placeholder primitive figures with DOM order cards.
+> be sourced or commissioned. Until then, customers are stylised primitive
+> figures with speech bubbles and a DOM order panel.
 
 ## 5. Animation list (if bought/sourced separately)
 

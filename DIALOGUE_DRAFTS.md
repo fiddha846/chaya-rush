@@ -1,13 +1,22 @@
-# Dialogue — Chaya Rush
+# Dialogue — ചായക്കട
 
 Status: **APPROVED by the owner (2026-11-03) and wired into the game.**
 The source of truth is now `src/config/strings.ml.js`; this file is kept for the
 English glosses, tone notes and history. If a line is edited, change
 `strings.ml.js` and update this document together.
 
-When a customer is served correctly, the game picks a line from
-`THANK_YOU_BY_ITEM_ML[itemId]` (falling back to `THANK_YOU_GENERIC_ML`). When
-patience expires, it picks from `COMPLAINT_ML` and keeps the order visible.
+The game is now a **continuous evening shift**, not a timed round. When a
+customer is served correctly, the game picks a line from
+`THANKS_BY_ITEM[itemId]` (falling back to `THANKS`). A customer complains at
+**45 s** using `COMPLAINTS_TEA` / `COMPLAINTS_GENERAL` /
+`COMPLAINTS_SAMOSA` / `COMPLAINTS_PAZHAMPORI` (or `COMPLAINTS_PARTIAL` after a
+partial delivery), and gives up at **60 s** using `GIVE_UP_TEA` / `GIVE_UP_ANY`.
+Bill requests come from `BILL_REQUESTS`; once paid, `BILL_THANKS` is spoken.
+
+The batch tables below are retained as historical drafts. They use the old
+export names (`THANK_YOU_BY_ITEM_ML`, `COMPLAINT_ML`) and some item IDs with
+spaces; the live IDs are the keys in `src/config/menu.js` (`kattan`,
+`muttabaji`, `uzhunnvada`, …).
 
 Please check the Malayalam spelling, tone, and whether any line feels rude
 rather than funny.
@@ -94,9 +103,9 @@ questions below are retained for context.
 
 ## Batch 3 — item-specific compliments
 
-Proposed structure: `THANK_YOU_BY_ITEM_ML` maps each menu ID to its own lines,
+Proposed structure: `THANKS_BY_ITEM` maps each menu ID to its own lines,
 so serving a samoosa never triggers a tea compliment. If an item has no lines
-(or none approved yet), fall back to the generic list below.
+(or none approved yet), fall back to the generic `THANKS` list below.
 
 ### Tea / drinks
 

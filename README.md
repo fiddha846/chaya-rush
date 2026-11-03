@@ -1,24 +1,31 @@
-# Chaya Rush 🌴☕
+# ചായക്കട ☕
 
-An interactive 3D Kerala **chayakkada** (tea shop) for the web.
-**Current build: Stage 2 — customers, Malayalam orders, serving and a 60-second round.**
+A small, warm, cartoon **3D Kerala chayakkada** that runs in the browser. You
+are the chaiwala behind the counter for one unhurried evening: customers walk in
+from the street, order in Malayalam, you make their tea and snacks, carry the
+tray over and settle the bill. Rain comes and goes, dogs nap inside, and the
+street keeps moving outside.
 
-> ⚠️ **All current 3D geometry, materials and textures are PLACEHOLDER ART.**
-> They exist to test layout, scale, camera, mood and game flow — not final
-> quality. Art direction is locked to **semi-realistic** (owner decision 1:B),
-> but final assets are not imported yet. See `ASSETS_NEEDED.md`.
+The repo/folder is still called `chaya-rush` for continuity, but the game itself
+is **ചായക്കട**. Every line the player sees is Malayalam script.
+
+> **Art status:** the whole scene is procedural, flat-colour placeholder art
+> built from Three.js primitives and canvas textures. It is intentionally
+> cartoon-styled (soft shapes, warm dusk palette), not realistic. Final authored
+> models are not imported yet — see `ASSETS_NEEDED.md`.
 
 ---
 
 ## Why Three.js?
 
-Three.js (r187.0, MIT license) was chosen because it:
+Three.js (r187.0, MIT) was chosen because it:
 
-- runs in any modern browser with WebGL2, no engine install;
-- loads **GLB/glTF** with skeletal animation via the official `GLTFLoader`;
-- has mature lighting, shadows, fog and material support for a semi-realistic look;
-- works **without Node or a build step** using ES modules + an import map,
-  so this project only needs Python's static file server.
+- runs in any modern browser with WebGL2, with no engine install;
+- handles lighting, shadows, fog and a stylised low-poly look well;
+- can load **GLB/glTF** models with skeletal animation via the vendored
+  `GLTFLoader` when final art arrives;
+- works **without Node or a build step** using ES modules + an import map, so
+  this project only needs Python's static file server.
 
 Alternatives considered: Babylon.js (heavier for this scope), PlayCanvas
 (editor-centric), react-three-fiber (adds React + build tooling).
@@ -73,41 +80,80 @@ the HTML file will show a loading screen that fails.
 
 ---
 
-## How to play (Stage 2)
+## How to play
 
 | Action | Input |
 | --- | --- |
 | Look around | Hold **left mouse** and drag (or drag with one finger) |
 | Look with keyboard | **Arrow keys** or **WASD** |
-| Select a customer | **Click the customer** or **click their order card** |
-| Serve an item | Click the matching item in the bottom **serve dock** |
-| Pointer lock (free look) | **Double-click** the canvas |
-| Release pointer lock | **Esc** |
-| Play again after the round | Click **Play again** (or press **R**) |
+| Free look (pointer lock) | **Double-click** the canvas; **Esc** releases |
+| Select a customer | **Click the customer**, their speech bubble, or their order card |
+| Prepare an item | Click the item line in the **order panel** (right side) |
+| Carry the tray | Click **എടുത്ത് കൊണ്ടുപോകൂ** |
+| Hand the tray over | Press **Space** or click **കൊടുക്കൂ** |
+| Open the menu | Press **M** or click **മെനു** |
+| Close a panel / cancel | **Esc** or the **×** button |
+| Deselect a customer | **Esc** |
 
-### Round rules
+There is no timer, score, or fail state — just a shift that keeps going. The HUD
+tracks **വരുമാനം** (earnings) and **സേവിച്ചത്** (items served).
 
-- The round lasts **60 seconds**.
-- A customer arrives every 5.5–8 seconds, up to **3 seated at once**.
-- Each order asks for **1–3 distinct menu items**.
-- Orders are shown in **Malayalam script** on cards above each customer.
-- Item IDs and prices are validated against `src/config/menu.js` — the only
-  source for prices and earnings.
-- Serving a correct item pays that item's price and shows an approved Malayalam
-  thank-you line. A wrong item is rejected and pays nothing.
-- Completing every item in an order finishes it; the customer thanks you and
-  leaves, freeing the seat.
-- At 0 seconds the round ends with a summary of earnings, orders completed and
-  items served.
+### The serving rhythm
 
-### Patience caveat (needs an owner decision)
+1. A customer walks in and speaks their order in Malayalam.
+2. Click them to open the order panel. Each line becomes a button.
+3. Click a line to prepare it. Clicking a **×2** line prepares **both** units, so
+   a tray is never half-loaded by accident.
+4. When something is ready, press **എടുത്ത് കൊണ്ടുപോകൂ**. The camera becomes
+   first-person: the chaiwala's hands and tray come into frame and walk to the
+   customer.
+5. Press **Space** / **കൊടുക്കൂ** to hand it over. The camera walks back to the
+   counter automatically.
+6. Once every item is served the customer thanks you, then asks for the bill.
+   Click **ബിൽ**, then **ബിൽ കൊടുക്കൂ** to settle it.
 
-Per-customer patience is currently **60 seconds** (`GAME_RULES.customerPatienceSec`),
-separate from the 60-second round. Because both are 60, a customer who arrives
-after the round starts cannot run out of patience before the round ends — so in
-a normal round the complaint state is not reachable. The code path exists and
-was tested by forcing patience to expire. **Ask before lowering this value**
-(e.g. 30–40 s) so complaints can happen naturally.
+### Seating and special cases
+
+- **Bench customers** — you carry the tray over, first-person.
+- **Counter customers** — handed over instantly, with a quick tray flash.
+- **Standing / outside-bench customers** — you carry the tray outside.
+- **Kids** — a child asks **“ചേട്ടാ, ഇതിന് എത്രയാ?”**. Pick the correct
+  chocolate price (₹5). Right answer: **“ഇത് രണ്ടെണ്ണം!”** and they buy two.
+  Wrong answer: they leave without buying.
+- **Patience** — a customer complains at **45 s** and gives up at **60 s**.
+  After asking for the bill, they wait **24 s** before leaving.
+- **Rain** — grey sky, rain streaks, a wet road that dries afterwards. Customers
+  comment on the rain; the owner says **“നല്ല മഴ അല്ലേ!”**. Dogs shelter inside
+  during the rain and head back out when it stops.
+- **Street life** — dogs wander and occasionally fight (the owner shoos them),
+  vehicles pass, and neighbours walk by with umbrellas.
+
+---
+
+## The menu
+
+Prices are fictional in-game rupees and live in `src/config/menu.js`.
+
+| Item | Malayalam | Price |
+| --- | --- | --- |
+| Tea | ചായ | ₹12 |
+| Strong tea | കട്ടൻ ചായ | ₹10 |
+| Coffee | കാപ്പി | ₹12 |
+| Boost | ബൂസ്റ്റ് | ₹15 |
+| Samosa | സമോസ | ₹15 |
+| Banana fritter | പഴംപൊരി | ₹15 |
+| Chicken roll | ചിക്കൻ റോൾ | ₹20 |
+| Parippu vada | പരിപ്പുവട | ₹15 |
+| Ulli vada | ഉള്ളിവട | ₹12 |
+| Egg bajji | മുട്ട ബജി | ₹15 |
+| Uzhunnu vada | ഉഴുന്നുവട | ₹12 |
+| Bonda | ബോണ്ട | ₹12 |
+| Sugiyan | സുഗിയൻ | ₹12 |
+| Chocolate (kids) | ചോക്ലേറ്റ് | ₹5 |
+
+`MENU_ITEMS` is the single source for IDs, labels, prices and spoken-order
+grammar. The chocolate price is set once in `CHOCOLATE.price` and the kid price
+buttons are generated from `CHOCOLATE_PRICE_CHOICES`.
 
 ---
 
@@ -115,29 +161,30 @@ was tested by forcing patience to expire. **Ask before lowering this value**
 
 ```
 chaya-rush/
-├─ index.html              # canvas, HUD, order cards, results, import map
+├─ index.html              # canvas, start screen, HUD, bill/kid/menu modals
+├─ styles.css              # HUD, bubbles, panels, modals, @font-face
 ├─ serve.py                # dev server with no-store caching
-├─ styles.css              # HUD, order cards, serve dock, overlays, @font-face
 ├─ src/
-│  ├─ main.js              # boot, render loop, selection raycast, resize
+│  ├─ main.js              # boot, intro, input, frame loop, debug handle
 │  ├─ config/
-│  │  ├─ menu.js           # SINGLE source for IDs, prices, earnings
-│  │  ├─ strings.ml.js     # approved Malayalam labels + dialogue
-│  │  └─ game.js           # round duration and per-customer patience
+│  │  ├─ layout.js         # shop/spot/service/camera/street coordinates
+│  │  ├─ menu.js           # items, prices, spoken-order grammar
+│  │  └─ strings.ml.js     # ALL player-facing Malayalam text
 │  ├─ game/
-│  │  ├─ customers.js      # seats, placeholder people, patience, leaving
-│  │  └─ session.js        # spawning, serving validation, earnings, round end
+│  │  ├─ customers.js      # customer lifecycle, orders, patience, paths
+│  │  └─ session.js        # shift loop, prep/carry/give/bill/kid logic
 │  ├─ player/
-│  │  └─ lookControls.js   # seated drag/keyboard/pointer-lock look
+│  │  └─ camera.js         # seat look, intro flight, carry + tray
 │  ├─ world/
-│  │  ├─ scene.js          # renderer, sky, street, lights
-│  │  └─ shop.js           # interior layout (placeholder geometry)
+│  │  ├─ art.js            # palette, materials, primitives, textures
+│  │  ├─ people.js         # people, dogs, food meshes, poses
+│  │  ├─ scene.js          # renderer, sky, lights, street, weather, traffic
+│  │  └─ shop.js           # chayakkada geometry, signage, seats
 │  └─ ui/
-│     ├─ hud.js            # loading / timer / score / toast / results
-│     └─ orders.js         # projected order cards + serving dock
+│     └─ hud.js            # DOM HUD, bubbles, order panel, modals
 ├─ assets/
 │  ├─ fonts/               # Noto Sans Malayalam + OFL.txt
-│  ├─ models/              # empty — GLB assets go here (see ASSETS_NEEDED.md)
+│  ├─ models/              # empty — final GLB assets go here
 │  └─ audio/               # empty — future ambience/SFX
 ├─ vendor/three/           # vendored Three.js r187.0 + MIT LICENSE
 ├─ ASSETS_NEEDED.md
@@ -146,77 +193,74 @@ chaya-rush/
 └─ README.md
 ```
 
----
+### Key conventions
 
-## Decisions already locked
-
-- **Art direction:** 1:B — semi-realistic (stylized realism).
-- **Timing:** 2:A — 60-second round with a **separate per-customer patience timer**.
-- **Currency:** fictional in-game rupees only. Prices live in `src/config/menu.js`.
-- **Malayalam:** item spellings and thank-you/complaint lines were approved by the
-  owner and are now wired from `src/config/strings.ml.js`.
-
-Still open (do not treat as final):
-
-- Per-customer patience value: currently 60 s, which cannot expire within the round.
-- Streak bonus amounts (`GAME_RULES.streakBonus` is `null`).
-- Human visual review of the placeholder scene and card layout.
-
----
-
-## What is intentionally NOT in this stage
-
-- Final semi-realistic art, authored GLB models, rigged characters, final textures
-- Sound effects, ambience, music
-- Streak bonuses (no amounts approved)
-- Walking movement (the player stays seated)
-- Saved progress, accounts, backend, or real money
+- **Axes:** the shop opens toward **−z**; **+z** is the back wall. People face
+  **+z** at yaw `0`.
+- **Scale:** 1 unit = 1 metre. Standing eye height ≈ 1.6–1.7 m.
+- **Coordinates:** shop front `z = -4.2`, back `z = 4.2`, width `9.6`. Owner eye
+  is `(0.35, 1.52, 3.42)`, looking down the shop.
+- **Text:** never add player-visible Manglish. Put new copy in
+  `src/config/strings.ml.js` and new prices/labels in `src/config/menu.js`.
 
 ---
 
 ## Verification log
 
-Automated checks were run in the in-app Chromium browser (WebGL2, Intel Iris Xe).
+Automated checks were run in the in-app Chromium browser (WebGL2, Intel Iris Xe)
+with **0 console errors / 0 warnings** unless noted.
 
-### Stage 1 — layout + look-around
+### Layout, camera and look
 
-- Page serves over HTTP and boots with **0 console errors / 0 warnings**.
-- `window.__CHAYA_RUSH__.ready === true`; loading overlay hides, HUD appears.
-- Drag/keyboard look works; pitch clamps at 52°; camera stays seated.
+- Page serves over HTTP, boots, hides the loading overlay and shows the start
+  screen.
 - Noto Sans Malayalam loads; Malayalam and `₹` glyph metrics are non-zero.
-- Warm render after baking shadows ≈ **8.8 ms/frame** at 1200×789, DPR 1.5.
+- Drag/keyboard look works; pitch clamps; camera stays in the owner's seat.
+- The exterior dusk establishing shot and the 7.4 s intro flight into the seat
+  complete without camera errors.
+- Carry camera paths were exercised for bench, counter and outside spots; the
+  defensive `sampleCurve()` fallback prevents Catmull-Rom endpoint crashes.
 
-### Stage 2 — orders + serving
+### Serving and money
 
-- Boots with **0 console errors / 0 warnings**.
-- All **13** menu buttons render with Malayalam labels and prices read from
-  `src/config/menu.js` (e.g. ചായ ₹12, ചിക്കൻ റോൾ ₹20).
-- Orders render as Malayalam cards anchored above customers; a fresh card is
-  created for each arrival and removed after departure.
-- Wrong-item serve returns `not-in-order`, adds **₹0** and does not change the order.
-- Correct serves add exactly the configured price (test: kaapi + sugiyan =
-  **₹24**), show an approved thank-you line, and complete the order.
-- Patience expiry switches the card to the complaint state, keeps the order
-  visible, and shows an approved Malayalam complaint (tested by forcing patience).
-- Round end shows the results overlay with earnings, completed orders and items
-  served; **Play again** resets the round, customers, earnings and timer.
-- Three order cards were checked at an 800×526 viewport: no card rectangles
-  overlap, and none collide with the top score bar or the serve dock.
-- 3D raycast selection hits a customer; order cards are also clickable/keyboard
-  selectable.
-- Draw stats during play: ~200 draw calls, ~10–11k triangles, 60 fps in the
-  in-app browser viewport.
+- A **1×ചായ + 2×ബോണ്ട** order was prepared, carried and given: **3 items**
+  delivered, **₹36** earned, order completed, bill total **₹36**.
+- Partial delivery pays only for what actually left the counter; a second trip
+  for the missing unit cannot double-charge.
+- Counter customers are served instantly; seated/outside customers use the
+  first-person tray walk and Space/button hand-over.
+- Bill request opens the bill modal, and **ബിൽ കൊടുക്കൂ** settles it and shows
+  the owner's thank-you.
 
-**Needs a human visual check** (I cannot judge composition or art quality, and
-this model cannot view screenshots):
+### Kids and rain
 
-- Framing/scale of customers at the three seats, and whether they intersect
-  tables or benches.
-- Whether the order cards point clearly at the right customer when they shift
-  to avoid overlap.
-- Whether the bottom serve dock is readable and not too tall at your window size.
-- Malayalam shaping and `₹` glyph at actual size in the cards, dock and menu board.
-- Overall dusk lighting: warm/inviting versus too dark.
+- Kid flow: correct ₹5 answer → “ഇത് രണ്ടെണ്ണം!” → 2 chocolates served →
+  **₹10** earned, no bill requested.
+- Wrong price → kid leaves without buying.
+- `forceRain(true)` shows the rain chip/owner line and wet road; `forceRain(false)`
+  dries the road and shows the “rain stopped” toast.
+- Dog-fight / dog-shoo world events surface the correct Malayalam lines.
+
+### Long-run simulation
+
+A scripted bot played a **240-second shift**:
+
+- **21 spawns**, **20 completed orders**, **40 items served**, **₹463** earned;
+- **0 complaints**, **0 give-ups**, **0 console errors or warnings**;
+- 13 menu items plus chocolate all resolve to a valid label and price.
+
+**Needs a human visual check** (this model cannot judge composition, and
+screenshots cannot be relied on in this environment):
+
+- Framing/scale of customers at the bench, counter and outside spots.
+- Whether the carry camera and tray read naturally at the player's window size.
+- Malayalam shaping and the `₹` glyph at actual size in the order panel, menu
+  board and modals.
+- Overall dusk lighting: warm and inviting versus too dark.
+- Performance on the target laptop (≈20 fps was observed with an unfocused tab;
+  foreground performance should be verified).
+
+---
 
 ## Troubleshooting
 
@@ -226,5 +270,18 @@ this model cannot view screenshots):
 - **Malayalam shows as boxes:** confirm `assets/fonts/NotoSansMalayalam-Variable.ttf`
   exists and reload with `Ctrl+F5`.
 - **Old version cached:** hard refresh with `Ctrl+F5`.
-- **Serving does nothing:** select a customer first (click the person or their
-  order card); the selected card gets an amber outline.
+- **Cannot prepare an item:** select a customer first; the order panel only
+  enables lines while that customer is ordering or complaining.
+- **Cannot give the tray:** the **കൊടുക്കൂ** button and Space only work after the
+  camera reaches the customer.
+- **Bill button missing:** the customer must have received every item and asked
+  for the bill.
+
+---
+
+## Not in this build yet
+
+- Final authored art, rigged character models and final textures
+- Sound effects, ambience or music
+- Saved progress, accounts, backend or real money
+- Expanded street storylines beyond the current ambient events

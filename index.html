@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ml">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Chaya Rush — Kerala Tea Shop</title>
-  <meta name="description" content="Chaya Rush — an interactive 3D Kerala chayakkada. Stage 2: customers, Malayalam orders, serving and a 60-second round." />
+  <title>ചായക്കട — കേരള ചായക്കട</title>
+  <meta name="description" content="ഒരു കേരള ചായക്കടയുടെ വൈകുന്നേരം — ബ്രൗസറിൽ കളിക്കാവുന്ന 3D ചായക്കട." />
   <link rel="stylesheet" href="./styles.css" />
 
   <!-- Local, vendored Three.js (no CDN, works offline once served locally) -->
@@ -18,98 +18,166 @@
   </script>
 </head>
 <body>
-  <div id="app" aria-label="3D view of the tea shop"></div>
+  <div id="app" aria-label="ചായക്കടയുടെ 3D കാഴ്ച"></div>
 
   <!-- Loading screen -->
   <div id="loading" class="overlay">
     <div class="loading-card">
-      <div class="loading-mark" aria-hidden="true">☕</div>
-      <h1 class="loading-title">Chaya Rush</h1>
-      <p class="loading-ml ml">ചായക്കട</p>
+      <div class="steam-mark" aria-hidden="true">
+        <span class="steam s1"></span><span class="steam s2"></span><span class="steam s3"></span>
+        <span class="cup">☕</span>
+      </div>
+      <h1 class="loading-title ml">ചായക്കട</h1>
+      <p class="loading-sub ml">ഒരു കേരള ചായക്കടയുടെ വൈകുന്നേരം</p>
       <div class="loading-bar"><span id="loading-bar-fill"></span></div>
-      <p id="loading-status" class="loading-status">Warming the tea…</p>
+      <p id="loading-status" class="loading-status ml">ചായ തയ്യാറാക്കുന്നു…</p>
     </div>
   </div>
 
-  <!-- In-game HUD (hidden until the scene is ready) -->
+  <!-- Start screen -->
+  <div id="start" class="overlay start" hidden>
+    <div class="start-card">
+      <p class="start-kicker ml">ഒരു കേരള ചായക്കട</p>
+      <h1 class="start-title ml">ചായക്കട</h1>
+      <p class="start-sub ml">വൈകുന്നേരത്തെ ഒരു കപ്പ് ചായ, കുറച്ച് വർത്തമാനം.</p>
+      <button id="start-button" class="btn btn-start ml" type="button">കട തുറക്കൂ</button>
+      <p class="start-hint ml">നോക്കാൻ മൗസ് വലിച്ചിടൂ · ഉപഭോക്താവിനെ ക്ലിക്ക് ചെയ്യൂ</p>
+      <p class="start-note ml">ചായ · കാപ്പി · പലഹാരം</p>
+    </div>
+  </div>
+
+  <!-- In-game HUD (hidden until the intro finishes) -->
   <div id="hud" class="hud" hidden>
-    <div class="hud-top">
+    <div id="bubble-layer" class="bubble-layer" aria-hidden="true"></div>
+
+    <header class="hud-top">
       <div class="brand">
-        <span class="brand-title">Chaya Rush</span>
-        <span class="brand-ml ml">ചായക്കട</span>
-      </div>
-
-      <div class="scorebar" aria-label="Round score">
-        <div class="score-item">
-          <span class="score-label">Time</span>
-          <span id="round-timer" class="score-value">60s</span>
-        </div>
-        <div class="score-item">
-          <span class="score-label">Earned</span>
-          <span id="earnings" class="score-value">₹0</span>
-        </div>
-        <div class="score-item">
-          <span class="score-label">Orders</span>
-          <span id="orders-served" class="score-value">0</span>
-        </div>
-      </div>
-
-      <div class="badges">
-        <span class="badge badge-stage">STAGE 2 · ORDERS</span>
-        <span class="badge badge-placeholder" title="All geometry and materials are temporary test art">
-          PLACEHOLDER ART
+        <span class="brand-mark" aria-hidden="true">☕</span>
+        <span class="brand-text">
+          <span class="brand-title ml">ചായക്കട</span>
+          <span class="brand-sub ml">ഒരു കേരള ചായക്കട</span>
         </span>
       </div>
-    </div>
 
-    <!-- Order cards are placed over the 3D customers every frame. -->
-    <div id="order-layer" class="order-layer"></div>
-
-    <div class="hud-bottom">
-      <div id="toast" class="toast" role="status" aria-live="polite"></div>
-
-      <div id="serve-dock" class="serve-dock">
-        <div class="serve-head">
-          <span id="serve-hint" class="serve-hint">Waiting for the first customer…</span>
-          <span id="serve-selected" class="serve-selected">No guest selected</span>
+      <div class="stats" aria-label="ഇന്നത്തെ കണക്ക്">
+        <div class="stat">
+          <span class="stat-label ml">വരുമാനം</span>
+          <span id="hud-earnings" class="stat-value">₹0</span>
         </div>
-        <div id="serve-grid" class="serve-grid"></div>
+        <div class="stat">
+          <span class="stat-label ml">സേവിച്ചത്</span>
+          <span id="hud-served" class="stat-value">0</span>
+        </div>
       </div>
 
-      <div class="hud-footer">
-        <div class="controls-hint">
-          <span><kbd>Drag</kbd> look around</span>
-          <span><kbd>Click</kbd> select guest</span>
-          <span><kbd>Tap item</kbd> serve</span>
-          <span><kbd>Double-click</kbd> pointer lock</span>
+      <div class="top-actions">
+        <span id="weather-chip" class="chip ml" data-rain="false">വെയിൽ</span>
+        <button id="menu-button" class="chip chip-btn ml" type="button">മെനു</button>
+      </div>
+    </header>
+
+    <aside id="order-panel" class="order-panel is-hidden" aria-live="polite">
+      <header class="order-head">
+        <div>
+          <p class="panel-kicker ml">ഓർഡർ</p>
+          <h2 id="order-name" class="order-name ml">ഉപഭോക്താവ്</h2>
+          <p id="order-spot" class="order-spot ml">ബെഞ്ചിൽ</p>
         </div>
-        <div class="fps" id="fps" aria-hidden="true">– fps</div>
+        <button id="order-close" class="icon-btn" type="button" aria-label="അടയ്ക്കൂ" data-close-order>×</button>
+      </header>
+
+      <div class="patience">
+        <div class="patience-track"><span id="patience-fill"></span></div>
+        <span id="patience-label" class="patience-label ml">കാത്തിരിപ്പ്</span>
+      </div>
+
+      <ul id="order-list" class="order-list"></ul>
+      <p id="panel-note" class="panel-note ml"></p>
+
+      <div class="panel-actions">
+        <button id="bill-btn" class="btn btn-primary ml" type="button" hidden>ബിൽ</button>
+        <button id="carry-btn" class="btn btn-primary ml" type="button">എടുത്ത് കൊണ്ടുപോകൂ</button>
+      </div>
+    </aside>
+
+    <div id="carry-bar" class="carry-bar">
+      <span id="carry-hint" class="carry-hint ml"></span>
+      <button id="give-button" class="btn btn-give ml" type="button" hidden>കൊടുക്കൂ</button>
+    </div>
+
+    <div id="owner-line" class="owner-line">
+      <span class="owner-avatar" aria-hidden="true">☕</span>
+      <span id="owner-text" class="owner-text ml"></span>
+    </div>
+
+    <div id="toast" class="toast ml" role="status" aria-live="polite"></div>
+
+    <footer class="hud-bottom">
+      <p id="hint-line" class="hint-line ml">നോക്കാൻ മൗസ് വലിച്ചിടൂ</p>
+      <p class="control-hints ml">
+        <span>വലിച്ചിട്ട് നോക്കാം</span>
+        <span>ക്ലിക്ക് ചെയ്ത് തിരഞ്ഞെടുക്കാം</span>
+        <span>സ്പേസ് അമർത്തി കൊടുക്കാം</span>
+      </p>
+      <div id="fps" class="fps" aria-hidden="true">ഫ്രെയിം</div>
+    </footer>
+  </div>
+
+  <!-- Intro caption -->
+  <div id="intro-caption" class="intro-caption ml" hidden>ഒരു സാധാരണ വൈകുന്നേരം…</div>
+
+  <!-- Bill -->
+  <div id="bill-modal" class="modal" hidden>
+    <div class="modal-card">
+      <header class="modal-head">
+        <p class="panel-kicker ml">ബിൽ</p>
+        <h2 class="modal-title ml">ഇന്നത്തെ കണക്ക്</h2>
+      </header>
+      <ul id="bill-list" class="bill-list"></ul>
+      <div class="bill-total-row">
+        <span class="ml">ആകെ</span>
+        <span id="bill-total" class="bill-total">₹0</span>
+      </div>
+      <div class="modal-actions">
+        <button id="bill-pay" class="btn btn-primary ml" type="button">ബിൽ കൊടുക്കൂ</button>
+        <button id="bill-close" class="btn btn-ghost ml" type="button">അടയ്ക്കൂ</button>
       </div>
     </div>
   </div>
 
-  <!-- Round summary -->
-  <div id="results" class="overlay results" hidden>
-    <div class="loading-card results-card">
-      <p class="results-kicker">TIME'S UP</p>
-      <h1 class="loading-title">Chaya Rush</h1>
-      <p class="results-ml ml">ചായക്കട</p>
-      <p class="results-earned"><span id="results-earnings">₹0</span></p>
-      <p id="results-orders" class="loading-status">0 orders completed</p>
-      <button id="play-again" class="play-again" type="button">Play again</button>
-      <p class="results-note">Placeholder art · client-side test build</p>
+  <!-- Kid's chocolate price -->
+  <div id="kid-modal" class="modal" hidden>
+    <div class="modal-card modal-card--kid">
+      <div class="kid-face" aria-hidden="true">🧒</div>
+      <p class="panel-kicker ml">ചോക്ലേറ്റ്</p>
+      <h2 class="modal-title ml">ചോക്ലേറ്റ് വില എത്ര?</h2>
+      <p id="kid-message" class="kid-message ml">ചേട്ടാ, ഇതിന് എത്രയാ?</p>
+      <p class="kid-hint ml">ശരിയായ വില തിരഞ്ഞെടുക്കൂ</p>
+      <div id="kid-options" class="kid-options"></div>
+    </div>
+  </div>
+
+  <!-- Full menu -->
+  <div id="menu-modal" class="modal" hidden>
+    <div class="modal-card modal-card--menu">
+      <header class="modal-head">
+        <p class="panel-kicker ml">ചായക്കട</p>
+        <h2 class="modal-title ml">ചായയും പലഹാരങ്ങളും</h2>
+        <p class="modal-note ml">എല്ലാ വിലയും രൂപയിൽ</p>
+      </header>
+      <ul id="menu-list" class="menu-list"></ul>
+      <div class="modal-actions">
+        <button id="menu-close" class="btn btn-ghost ml" type="button">അടയ്ക്കൂ</button>
+      </div>
     </div>
   </div>
 
   <!-- Fatal error surface -->
   <div id="error" class="overlay error" hidden>
     <div class="loading-card">
-      <h1 class="loading-title">Something went wrong</h1>
-      <p id="error-text" class="loading-status"></p>
-      <p class="error-help">
-        Make sure the project is being served over HTTP (not opened as a file).
-        See <code>README.md</code> for the exact command.
-      </p>
+      <h1 class="loading-title ml">എന്തോ കുഴപ്പം പറ്റി</h1>
+      <p id="error-text" class="loading-status ml">ബ്രൗസറിൽ 3D സീൻ തുറക്കാനായില്ല. പേജ് ഒന്ന് പുതുക്കിനോക്കൂ.</p>
+      <p class="error-help ml">ഫയൽ നേരിട്ട് തുറക്കാതെ, സർവറിലൂടെ തുറക്കൂ.</p>
     </div>
   </div>
 
