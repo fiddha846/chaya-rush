@@ -19,7 +19,7 @@ export const MENU_ITEMS = [
     drink: "tea",
   },
   {
-    id: "kattan",
+    id: "kattan chaya",
     label: "കട്ടൻ ചായ",
     price: 10,
     kind: "drink",
@@ -99,7 +99,7 @@ export const MENU_ITEMS = [
     color: "#b96f2c",
   },
   {
-    id: "muttabaji",
+    id: "mutta baji",
     label: "മുട്ട ബജി",
     price: 15,
     kind: "snack",
@@ -109,7 +109,7 @@ export const MENU_ITEMS = [
     color: "#e0a84c",
   },
   {
-    id: "uzhunnvada",
+    id: "uzhnnvada",
     label: "ഉഴുന്നുവട",
     price: 12,
     kind: "snack",

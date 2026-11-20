@@ -511,7 +511,7 @@ export function createFoodMesh(id, { scale = 1 } = {}) {
   if (!item) return group;
 
   if (item.kind === "drink") {
-    const liquid = item.id === "kaapi" ? C.coffee : item.id === "kattan" ? "#6b2f16" : item.id === "boost" ? C.boost : C.tea;
+    const liquid = item.id === "kaapi" ? C.coffee : item.id === "kattan chaya" ? "#6b2f16" : item.id === "boost" ? C.boost : C.tea;
     addCyl(
       group,
       0.035,

@@ -13,10 +13,31 @@ customer is served correctly, the game picks a line from
 partial delivery), and gives up at **60 s** using `GIVE_UP_TEA` / `GIVE_UP_ANY`.
 Bill requests come from `BILL_REQUESTS`; once paid, `BILL_THANKS` is spoken.
 
+### Verbatim lines (2026-11-20 owner brief)
+
+The owner supplied six delay complaints and three give-up lines and asked for
+them **exactly as written**. They are stored in `DELAY_COMPLAINTS_EXACT` and
+`GIVE_UP_LINES_EXACT` in `strings.ml.js` and used by `COMPLAINTS_TEA`,
+`COMPLAINTS_GENERAL`, `GIVE_UP_TEA` and `GIVE_UP_ANY`. The romanised Manglish
+spellings are intentional — the Malayalam versions below are English glosses /
+notes only and must never replace the spoken line.
+
+| # | Spoken verbatim | Gloss |
+| --- | --- | --- |
+| D1 | evdedo chaya | Where's the tea? |
+| D2 | anik poyit vere pani und | I have other work after this. |
+| D3 | ചായ ഒന്ന് വേഗം കിട്ടിയാൽ നന്നായിരുന്നു. | It would be nice to get the tea quickly. |
+| D4 | ചായയല്ലേ, എന്താ ഇത്ര നേരം? | It's just tea — why so long? |
+| D5 | ചായ കിട്ടുമോ ഇല്ലേ? | Will I get the tea or not? |
+| D6 | andha biriyanik aano chodhichath | Did I order biryani? |
+| G1 | enik venda thante chaya any | I don't want your tea now. |
+| G2 | അടുത്ത തവണ ഞാൻ വീട്ടിൽ നിന്ന് കുടിച്ചോളാം! | Next time I'll drink at home! |
+| G3 | any ath ninnte thandhak kodkk | Give it to your father now. |
+
 The batch tables below are retained as historical drafts. They use the old
-export names (`THANK_YOU_BY_ITEM_ML`, `COMPLAINT_ML`) and some item IDs with
-spaces; the live IDs are the keys in `src/config/menu.js` (`kattan`,
-`muttabaji`, `uzhunnvada`, …).
+export names (`THANK_YOU_BY_ITEM_ML`, `COMPLAINT_ML`). The live IDs are exactly
+the owner's IDs in `src/config/menu.js`: `kattan chaya`, `mutta baji`,
+`uzhnnvada`, … (spaces and spelling preserved).
 
 Please check the Malayalam spelling, tone, and whether any line feels rude
 rather than funny.

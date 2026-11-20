@@ -121,7 +121,10 @@ tracks **വരുമാനം** (earnings) and **സേവിച്ചത്** 
   chocolate price (₹5). Right answer: **“ഇത് രണ്ടെണ്ണം!”** and they buy two.
   Wrong answer: they leave without buying.
 - **Patience** — a customer complains at **45 s** and gives up at **60 s**.
-  After asking for the bill, they wait **24 s** before leaving.
+  After asking for the bill, they wait **24 s** before leaving. The owner's six
+  complaint lines and three give-up lines are used **verbatim**, including the
+  romanised ones (`evdedo chaya`, `enik venda thante chaya any`, …); see
+  `DIALOGUE_DRAFTS.md` for glosses.
 - **Rain** — grey sky, rain streaks, a wet road that dries afterwards. Customers
   comment on the rain; the owner says **“നല്ല മഴ അല്ലേ!”**. Dogs shelter inside
   during the rain and head back out when it stops.

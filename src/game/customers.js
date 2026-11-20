@@ -256,7 +256,7 @@ export class Customer {
   giveUp() {
     if (this.gaveUp) return;
     this.gaveUp = true;
-    const hasTea = this.lines.some((l) => l.id === "chaya" || l.id === "kattan");
+    const hasTea = this.lines.some((l) => l.id === "chaya" || l.id === "kattan chaya");
     this.say(pick(hasTea ? GIVE_UP_TEA : GIVE_UP_ANY), "bad", Infinity);
     this.state = "leaving";
     this.path = leavePath(this.spot, this.group.position);

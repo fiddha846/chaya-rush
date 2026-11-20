@@ -145,17 +145,25 @@ export const OWNER = {
   rain: OWNER_RAIN,
 };
 
-/** Delay complaints, exactly as approved (1–6), plus extra drafts (7–12). */
-export const COMPLAINTS_TEA = [
-  "എവിടെടോ ചായ?",
+/**
+ * The owner's six delay complaints. These MUST appear verbatim, including the
+ * romanised Manglish spellings — they were supplied as final dialogue, not as
+ * text to translate. English/Malayalam glosses live in DIALOGUE_DRAFTS.md only.
+ */
+export const DELAY_COMPLAINTS_EXACT = [
+  "evdedo chaya",
+  "anik poyit vere pani und",
   "ചായ ഒന്ന് വേഗം കിട്ടിയാൽ നന്നായിരുന്നു.",
   "ചായയല്ലേ, എന്താ ഇത്ര നേരം?",
   "ചായ കിട്ടുമോ ഇല്ലേ?",
+  "andha biriyanik aano chodhichath",
 ];
 
+/** Delay complaints: the verbatim six, plus the owner's editable extras (7–12). */
+export const COMPLAINTS_TEA = [...DELAY_COMPLAINTS_EXACT];
+
 export const COMPLAINTS_GENERAL = [
-  "എനിക്ക് പോയിട്ട് വേറെ പണി ഉണ്ട്",
-  "എന്താ, ബിരിയാണിക്കാണോ ചോദിച്ചത്?",
+  ...DELAY_COMPLAINTS_EXACT,
   "ചേട്ടാ, ഓർഡർ മറന്നോ?",
   "ചേട്ടാ, കട ക്ലോസ് ചെയ്യുവാണോ?",
 ];
@@ -171,12 +179,15 @@ export const COMPLAINTS_PARTIAL = [
   "ചേട്ടാ, ഓർഡറിന്റെ ബാക്കി എവിടെ?",
 ];
 
-/** Give-up lines, exactly as approved. */
-export const GIVE_UP_TEA = ["എനിക്ക് വേണ്ട തന്റെ ചായ ഇനി"];
-export const GIVE_UP_ANY = [
+/** The owner's three give-up lines, verbatim (do not translate). */
+export const GIVE_UP_LINES_EXACT = [
+  "enik venda thante chaya any",
   "അടുത്ത തവണ ഞാൻ വീട്ടിൽ നിന്ന് കുടിച്ചോളാം!",
-  "ഇനി അത് നിന്റെ തന്തയ്ക്ക് കൊടുക്ക്",
+  "any ath ninnte thandhak kodkk",
 ];
+
+export const GIVE_UP_TEA = [...GIVE_UP_LINES_EXACT];
+export const GIVE_UP_ANY = [...GIVE_UP_LINES_EXACT];
 
 /** Bill requests, owner line plus approved variants. */
 export const BILL_REQUESTS = [
@@ -206,7 +217,7 @@ export const THANKS = [
 
 export const THANKS_BY_ITEM = {
   chaya: ["ചായ കിടിലം ചേട്ടാ!", "നല്ല ചൂട് ചായ, ഒരു ഗ്ലാസ് കൂടി!"],
-  kattan: ["കട്ടൻ ചായ നല്ല കട്ടി!", "കട്ടൻ ചായ കിടിലം ചേട്ടാ!"],
+  "kattan chaya": ["കട്ടൻ ചായ നല്ല കട്ടി!", "കട്ടൻ ചായ കിടിലം ചേട്ടാ!"],
   kaapi: ["കാപ്പിയുടെ മണം ഗംഭീരം!", "കാപ്പി കിടിലം ചേട്ടാ!"],
   boost: ["ബൂസ്റ്റ് കുടിച്ചിട്ട് ഉഷാറായി!", "ബൂസ്റ്റ് സൂപ്പർ!"],
   samoosa: ["സമോസ കിടിലം ചേട്ടാ!", "സമോസയുടെ ഉള്ള് നിറച്ചിട്ടുണ്ട്!"],
@@ -214,8 +225,8 @@ export const THANKS_BY_ITEM = {
   chickenroll: ["ചിക്കൻ റോൾ കിടിലം!", "ചിക്കൻ റോളിൽ ചിക്കൻ കുറവല്ല!"],
   paripuvada: ["പരിപ്പുവട നന്നായിട്ടുണ്ട്!", "പരിപ്പുവടയുടെ രുചി കൊള്ളാം!"],
   ullivada: ["ഉള്ളിവട സൂപ്പർ!", "ഉള്ളിവട നന്നായി വറുത്തിട്ടുണ്ട്!"],
-  muttabaji: ["മുട്ട ബജി കിടിലം!", "മുട്ട ബജി നന്നായിട്ടുണ്ട്!"],
-  uzhunnvada: ["ഉഴുന്നുവട ഗംഭീരം!", "ഉഴുന്നുവട നല്ല രുചി!"],
+  "mutta baji": ["മുട്ട ബജി കിടിലം!", "മുട്ട ബജി നന്നായിട്ടുണ്ട്!"],
+  uzhnnvada: ["ഉഴുന്നുവട ഗംഭീരം!", "ഉഴുന്നുവട നല്ല രുചി!"],
   bonda: ["ബോണ്ട സൂപ്പർ ആയിട്ടുണ്ട് ചേട്ടാ!", "ബോണ്ട നന്നായിട്ടുണ്ട്!"],
   sugiyan: ["സുഗിയൻ നല്ല മധുരം!", "സുഗിയൻ കിടിലം!"],
 };
